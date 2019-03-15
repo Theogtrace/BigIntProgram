@@ -1,0 +1,25 @@
+
+public class BigIntDemo {
+
+	public static void main(String[] args) throws RuntimeException  {
+		BigInt b1; 
+    	BigInt b2; 
+    	BigInt b3 = null; 
+    	b1 = new BigInt("10");
+    	b2 = new BigInt("40");
+    	
+    	b3 = BigInt.add(b1,b2);
+	System.out.println("1) sum b3 is " + b1 +" + " + b2 + " = " + b3);
+
+	b3 = BigInt.sub(b1,b2);
+	System.out.println("2)difference b3 is " + b1 +" - " + b2 + " = " + b3);
+//	b3 = BigInt.mult(b1,b2);
+//	System.out.println("3)product b3 is " + b1 +" * " + b2 + " = " + b3);
+//	b3= BigInt.div(b1,b2);
+//	System.out.println("4) quotient b3 is "+b1+"/"+ b2 +"="+b3);
+	
+
+
+	}
+
+}

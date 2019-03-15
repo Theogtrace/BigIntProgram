@@ -1,0 +1,8 @@
+
+public class RuntimeException {
+
+	public RuntimeException() {
+		// TODO Auto-generated constructor stub
+	}
+
+}

@@ -1,0 +1,83 @@
+how to multiply 2 biginteger arrays in java
+https://www.chegg.com/homework-help/questions-and-answers/ok-two-java-programs-go-together-demo-program-needs-run--everytime-try-run-demo-says-java--q5485366
+http://stackoverflow.com/questions/5318068/how-to-handle-very-large-numbers-in-java-without-using-java-math-biginteger
+https://silentmatt.com/blog/2011/10/how-bigintegers-work-part-2-multiplication/
+http://interviewqa4java.blogspot.com/2012/02/how-do-i-multiply-2-big-integers.html
+
+				if(carry>9)
+				{
+					sum = c[j] + carry;
+					carry = (int) Math.floor(sum/10);
+					c[j] = sum % 10;
+					
+				}
+
+private int[] mulArr(int[] a, int[] b)
+	{
+		int len = a.length;
+		int len1 = b.length;
+		int c[];
+		int diff, count = len;
+		c = new int[len + len1 ];
+		diff = len1 - len;
+		if(len > len1)
+		{
+			count = len1;
+			diff = len - len1;
+		}
+		int i = a.length - 1 ,store = c.length -1 , extra = 0 , sec = b.length - 1 , flow = 0;
+		int sum;
+		for(int j = 0;j<count;j++)
+		{
+			while(i >= 0 && store >= 0)
+			{
+				if((a[i]* b[sec] + extra) >= 10)
+				{
+					sum = (a[i] * b[sec] + extra + c[store]);
+					c[store] = (sum/10);
+					extra = sum%10;  
+				}
+				else
+				{
+					c[store] += a[i] * b[sec] + extra;
+					extra = 0;
+				}
+				store--;
+				i--;
+			}
+			i = a.length - 1;
+			sec--;
+			flow++;
+			store = c.length - flow - diff ;
+		}
+
+		return removeLeadingZero(c);
+	}
+
+			int carry1 = 0;
+			int size1 = Math.max(c.length, sum.length) + 1;
+			int[] kk = new int[size1];
+			for (int l = 0; l < c.length || l < sum.length || carry1 > 0; i++)
+
+			{
+				int addsum = carry1;
+
+				if (i < a.length)
+
+					addsum += c[l];
+
+				if (i < b.length)
+
+					addsum += b[l];
+
+
+				carry1 = addsum / 10;
+
+				addsum = addsum % 10;
+
+				kk[i] = addsum;
+		
+
+			}
+			
+		}return removeLeadingZero(kk);

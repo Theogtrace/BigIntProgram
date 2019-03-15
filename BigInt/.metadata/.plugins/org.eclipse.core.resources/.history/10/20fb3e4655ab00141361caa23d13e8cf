@@ -1,0 +1,634 @@
+
+import java.util.ArrayList;
+
+
+	public class BigInt{
+
+
+		 private boolean isPositive;
+		    private ArrayList<Integer> num ;
+		    private String str;
+		 
+		    // Default constructor
+		    public BigInt()
+		    {
+		     isPositive= true;
+		     num = new ArrayList<Integer>();
+		     str= "0";
+		    }
+		 
+		    public BigInt(String str) {
+		 
+		        this.str = str;
+		 
+		        // check for legal string
+		        if (isLegal(str))
+		        {
+		            readBigInt(str);
+		        }
+		        else
+		        {
+		            System.out.println("Illegal String Input: " + str);
+		        }
+		    }
+		 
+		    // Both B1 and B2 are positive and/or B1 is bigger than B2 and/or B1 and B2
+		    // could be the same.
+		    // - returns the BigInt result
+		    private BigInt addHelper(BigInt B1, BigInt B2) {
+		         
+		 
+		        int size1 = B1.num.size(), size2 = B2.num.size();// sizes of B1 and B2
+		        BigInt result = new BigInt();
+		 
+		        boolean carryover = false; // if the result of adding two digits is > 9,
+		                                    // set to true
+		                                    // In case carryover is true, add 1 to next
+		                                    // more significant digit addition.
+		                                    //
+		                                    // add from least significant digit, leaving
+		                                    // one space unoccupied at
+		                                    // result in case of carryover.
+		        int first = size1 - 1,
+		            second = size2 - 1,
+		            three;
+		 
+		        // B1 and B2 are positive and B1 >= B2.
+		 
+		        for (int i = size1 - 1; i >= 0; i--) { // the digits of B1 from least
+		                                                // significant digit.
+		 
+		            // B2 can be shorter in size. First and second are indices of B1 and
+		            // B2, respectively.
+		            if (second >= 0) {
+		                // if carryover has happened, add one to the result.
+		                if (carryover == true) {
+		                    three = B1.num.get(first) + B2.num.get(second) + 1;
+		                    carryover = false;
+		                } else
+		                    three = B1.num.get(first) + B2.num.get(second);
+		 
+		            } else {
+		                // if carryover has happened, add one to the result.
+		                if (carryover == true) {
+		                    three = B1.num.get(first) + 1;
+		                    carryover = false;
+		                } else
+		                    three = B1.num.get(first);
+		            }
+		 
+		            // check if a new carryover has occurred at this new digit after
+		            // adding two digits.
+		            if (three >= 10)
+		                carryover = true;
+		            three = three % 10; // 9 + 9 = 18; and 18 % 10 = 8; carryover has
+		                                // occurred
+		            // add three to result's num and go to next lower digit.
+		            result.num.add(0, three);
+		            first--;
+		            second--;
+		 
+		        } // End of for loop.
+		 
+		        // if, at the end, carryover has happened, the first
+		        // slot of result's ArrayList num gets one.
+		        if (carryover)
+		            result.num.set(0, 1);
+		         
+		        return result;
+		    }
+		 
+		    // Both B1 and B2 are positive and/or B1 is bigger than B2 and/or B1 and B2
+		    // could be the same.
+		    // - returns the BigInt result
+		    private BigInt subtractHelper(BigInt B1, BigInt B2) {
+		        int size1 = B1.num.size(), size2 = B2.num.size();// sizes of B1 and B2
+		        BigInt result = new BigInt();
+		 
+		        boolean borrowed = false; // if the first digit is smaller than second,
+		                                    // = true.
+		                                    // In case borrowed is true, subtract 1 from
+		                                    // next more significant digit
+		                                    // of B1.
+		                                    //
+		                                    // subtract from least significant digit.
+		 
+		        int first = size1 - 1,
+		            second = size2 - 1,
+		            three;
+		 
+		        // B1 and B2 are positive and B1 >= B2.
+		        int B1_current_digit;
+		        for (int i = size1 - 1; i >= 0; i--) { // all the digits of B1 from
+		                                                // least significant digit.
+		 
+		            // B2 can be shorter in size. First and second are indices of B1 and
+		            // B2, respectively.
+		            if (second >= 0) {
+		                // if borrow has happened from previous round.
+		                // subtract one from B1's current digit.
+		                if (borrowed == true) {
+		                    if (B1.num.get(first) == 0) {
+		                        B1_current_digit = 9;
+		                        borrowed = true;
+		                    } else { // B1's current digit is non-zero and can just
+		                                // subtract one for borrowed case.
+		                        B1_current_digit = B1.num.get(first) - 1;
+		                        borrowed = false;
+		                    }
+		 
+		                } else {
+		                    B1_current_digit = B1.num.get(first);
+		 
+		                    // if the resulting B1 current digit is smaller than that of
+		                    // B2, have to borrow from left.
+		                    if (B1_current_digit < B2.num.get(second)) {
+		                        borrowed = true;
+		                        B1_current_digit = 10 + B1_current_digit;
+		                    } else { //
+		                        borrowed = false;
+		                    }
+		                }
+		 
+		                three = B1_current_digit - B2.num.get(second);
+		 
+		            } else {
+		                // if borrow has happened from previous round.
+		                // Then, subtract one from B1's current digit.
+		                if (borrowed == true) {
+		                    if (B1.num.get(first) == 0) {
+		                        B1_current_digit = 9;
+		                        borrowed = true;
+		                    } else { // B1's current digit is non-zero and can just
+		                                // subtract one for borrowed case.
+		                        B1_current_digit = B1.num.get(first) - 1;
+		                        borrowed = false;
+		                    }
+		 
+		                } else {
+		                    B1_current_digit = B1.num.get(first);
+		                }
+		 
+		                three = B1_current_digit;
+		            }
+		 
+		            // set three to result's num and go to next lower digit.
+		            result.num.add(0, three);
+		            first--;
+		            second--;
+		 
+		        } // End of for loop.
+		 
+		        // if, at the end, result's num value at index 0 is zero, remove
+		        if (result.num.size() > 1 && result.num.get(0) == 0)
+		            result.num.remove(0);
+		 
+		        return result;
+		    }
+		 
+		    private boolean isBigger(BigInt B2) {
+		         
+		 
+		        // B1 is negative and B2 is positive. B1 is not bigger than B2.
+		        if (this.isPositive == false && B2.isPositive == true)
+		            return false;
+		        // B1 is positive and B2 is negative. B1 is bigger than B2.
+		        else if (this.isPositive == true && B2.isPositive == false)
+		            return true;
+		 
+		        // Both B1 (this class instance) and B2 are negative.
+		        else if (this.isPositive == false && B2.isPositive == false) {
+		            if (this.num.size() < B2.num.size())
+		                return true; // -12 > -120
+		            else if (this.num.size() > B2.num.size())
+		                return false; // -123 < -12
+		            else { // -123 vs -125
+		                for (int i = 0; i < this.num.size(); i++) {
+		                    if (this.num.get(i) > B2.num.get(i))
+		                        return false; // -222 < -122
+		                    else if (this.num.get(i) < B2.num.get(i))
+		                        return true; // -122 > -222
+		                    else
+		                        continue; // tie is broken by comparing the next
+		                                    // following digits.
+		                }
+		            }
+		        }
+		 
+		        // Both B1 and B2 are positive.
+		        else {
+		            if (this.num.size() < B2.num.size())
+		                return false; // 11 < 111
+		            else if (this.num.size() > B2.num.size())
+		                return true; // , 111 > 11
+		            else { // Both B1 and B2 has same size => compare individual digits.
+		                for (int i = 0; i < this.num.size(); i++) {
+		                    if (this.num.get(i) > B2.num.get(i))
+		                        return true; // 211 > 111
+		                    else if (this.num.get(i) < B2.num.get(i))
+		                        return false; // 111 < 211
+		                    else
+		                        continue;
+		                }
+		 
+		            }
+		        }
+		 
+		        return false;
+		    }
+		 
+		    public boolean isLarger(BigInt B2) {
+		        return isBigger(B2);
+		    }
+		 
+		    // Add B2 to this current B1 and return result
+		    public BigInt add(BigInt B2) {
+		        BigInt result = new BigInt();
+		 
+		        // Both B1 and B2 are positive.
+		        if (this.isPositive && B2.isPositive) {
+		 
+		            if (this.isBigger(B2) || (this.num.size() == B2.num.size())) {// "121345" > "123"
+		                result = addHelper(this, B2);
+		            } else { // B2 is bigger than B1 or equal to B2.
+		                result = addHelper(B2, this);
+		            }
+		 
+		            // Both B1 and B2 are negative.
+		 
+		        } else if (this.isPositive == false && B2.isPositive == false) {
+		 
+		            BigInt absoluteB1 = new BigInt();
+		            BigInt absoluteB2 = new BigInt();
+		 
+		            absoluteB1 = this;
+		            absoluteB1.isPositive = true;
+		            absoluteB2 = B2;
+		            absoluteB2.isPositive = true;
+		            result = absoluteB1.add(absoluteB2);
+		            result.isPositive = false;
+		 
+		            this.isPositive = false;
+		            B2.isPositive = false;
+		 
+		        }
+		 
+		        // B1 is negative and B2 is positive
+		        else if (!this.isPositive && B2.isPositive) {
+		            BigInt absoluteB1 = new BigInt();
+		 
+		            absoluteB1 = this;
+		            absoluteB1.isPositive = true;
+		 
+		            if (this.num.size() > B2.num.size()) {
+		 
+		                // This will do B1 - B2 and (B1 and B2 are positive.)
+		                result = subtractHelper(absoluteB1, B2);
+		                result.isPositive = false;
+		 
+		            } else if (this.num.size() < B2.num.size()) {
+		 
+		                // This will do B2 - B1 and (B1 and B2 are positive.)
+		                result = subtractHelper(B2, absoluteB1);
+		                result.isPositive = true;
+		 
+		            } else { // B1 and B2 has same size.
+		 
+		                if (absoluteB1.isBigger(B2)) {
+		                    result = subtractHelper(absoluteB1, B2);
+		                    result.isPositive = false;
+		 
+		                } else {
+		                    // Positive B2 is bigger than absolute B1.
+		                    // This will do B2 - B1 and (B1 and B2 are positive.)
+		                    result = subtractHelper(B2, absoluteB1);
+		                    result.isPositive = true;
+		                }
+		 
+		            }
+		 
+		            this.isPositive = false;
+		 
+		            // B1 is positive and B2 is negative.
+		        } else {
+		            BigInt absoluteB2 = new BigInt();
+		 
+		            absoluteB2 = B2;
+		            absoluteB2.isPositive = true;
+		 
+		            if (this.num.size() < B2.num.size()) {
+		 
+		                // This will do B2 - B1 and (B1 and B2 are positive.)
+		                result = subtractHelper(absoluteB2, this);
+		                result.isPositive = false;
+		 
+		            } else if (this.num.size() > B2.num.size()) {
+		 
+		                // This will do B1 - B2 and (B1 and B2 are positive.)
+		                result = subtractHelper(this, absoluteB2);
+		                result.isPositive = true;
+		 
+		            } else { // B1 and B2 has same size.
+		 
+		                if (absoluteB2.isBigger(this)) {
+		                    result = subtractHelper(absoluteB2, this);
+		                    result.isPositive = false;
+		 
+		                } else {
+		                    // Positive B1 is bigger than absolute B2.
+		                    // This will do B2 - B1 and (B1 and B2 are positive.)
+		                    result = subtractHelper(this, absoluteB2);
+		                    result.isPositive = true;
+		                }
+		 
+		            }
+		 
+		            B2.isPositive = false;
+		        }
+		 
+		         
+		        return result;
+		    }
+		 
+		    // Subtract B2 from the current BigInt B1 and return result
+		    public BigInt sub(BigInt B2) {
+		        BigInt result = new BigInt();
+		 
+		        // Both B1 and B2 are positive.
+		        if (this.isPositive && B2.isPositive) {
+		 
+		            if (this.isBigger(B2)) {// "121345" > "123" (B1 is bigger than B2)
+		                result = subtractHelper(this, B2);
+		                result.isPositive = true;
+		            } else { // B2 is bigger than B1 or equal to B2.
+		                result = subtractHelper(B2, this);
+		                int zero_count = 0;
+		                for (int i = 0; i < result.num.size(); i++) {
+		                    if (result.num.get(i) == 0)
+		                        zero_count++;
+		                }
+		                if (zero_count == result.num.size()) {
+		                    result.isPositive = true;
+		                } else
+		                    result.isPositive = false;
+		            }
+		 
+		            // II. Both B1 and B2 are negative.
+		 
+		        } else if (this.isPositive == false && B2.isPositive == false) {
+		            BigInt absoluteB2 = new BigInt();
+		 
+		            absoluteB2 = B2;
+		            absoluteB2.isPositive = true;
+		            result = B2.add(this);
+		 
+		            B2.isPositive = false;
+		        }
+		 
+		        // III. B1 is negative and B2 is positive
+		        // It's like adding two negative numbers.
+		 
+		        else if (!this.isPositive && B2.isPositive) {
+		            BigInt absoluteB1 = new BigInt();
+		 
+		            absoluteB1 = this;
+		            absoluteB1.isPositive = true;
+		 
+		            result = absoluteB1.add(B2);
+		            result.isPositive = false;
+		 
+		            // restore sign of B1
+		            this.isPositive = false;
+		 
+		            // IV. B1 is positive and B2 is negative.
+		            // It's like adding two positive numbers.
+		        } else {
+		            BigInt absoluteB2 = new BigInt();
+		 
+		            absoluteB2 = B2;
+		            absoluteB2.isPositive = true;
+		 
+		            result = this.add(absoluteB2);
+		 
+		            // restore sign of B2
+		            B2.isPositive = false;
+		        }
+		 
+		        return result;
+		    }
+		 
+		    public BigInt multiply(BigInt B2) {
+		        BigInt result = new BigInt();
+		        BigInt zero = new BigInt("0");
+		        BigInt b = new BigInt();
+		         
+		        for (int i = 0; i < B2.str.length(); ++i) {
+		            b = singleDigitMultiply(                                 //ERROR<-------------------------------------
+		                    B2.str.charAt(B2.str.length() - i - 1), i);
+		            result = result.add(b);
+		        }
+		         
+		        // anything * 0 is 0
+		        if (this.add(zero).toString().equals("0") || B2.add(zero).toString().equals("0") ||
+		                this.add(zero).toString().equals("-0") || B2.add(zero).toString().equals("-0"))
+		            {
+		                result.num.clear();
+		                result.num.add(0);
+		            }
+		        else if ((!this.isPositive && B2.isPositive) ||
+		                (this.isPositive && !B2.isPositive))
+		        {
+		            //if not 0, assign negative when -a * b or a * -b
+		            result.isPositive = false;
+		        }
+		 
+		        return result;
+		    }
+		 
+		    private BigInt singleDigitMultiply(char b, int baseFactor) {
+		        StringBuffer tmp = new StringBuffer("");
+		         
+		        int carry = 0;
+		        for (int i = 0; i < str.length(); ++i)  //ERROR<-------------------------------------
+		        {
+		             
+		            if (str.charAt(str.length() - i - 1) != '-' && str.charAt(str.length() - i - 1)
+		                != '+' && b != '-' && b != '+')
+		            {
+		                int d = str.charAt(str.length() - i - 1) - '0';
+		                int r = d * (b - '0') + carry;
+		                carry = r / 10;
+		                int digit = r % 10;
+		                tmp.append(digit);
+		            }
+		        }
+		         
+		        if (carry != 0)
+		            tmp.append(carry);
+		 
+		        String result = tmp.reverse().toString();
+		        // add enough zeros to the result
+		        for (int i = 0; i < baseFactor; ++i) {
+		            result += '0';
+		        }
+		         
+		         
+		        return new BigInt(result);
+		    }
+		     
+		    public BigInt divideBy(BigInt B2)
+		    {
+		        BigInt result;
+		        BigInt divisor = B2;
+		        BigInt dividend = this;
+		         
+		        divisor.isPositive = true;
+		        dividend.isPositive = true;
+		                 
+		         
+		        if (divisor.toString().equals("0") ||
+		            divisor.toString().equals("+0") ||
+		            divisor.toString().equals("-0"))
+		        {
+		            System.out.println("CANNOT DIVIDE BY 0");
+		            //cannot divide by 0
+		            result = new BigInt("NaN");
+		        }
+		        else if (divisor.equals(dividend))
+		        {
+		            //anything divided by self is 1
+		            result = new BigInt("1");
+		        }
+		        else if (dividend.equals("0"))
+		        {
+		            //0 divided by anything is 0
+		            result = new BigInt("0");
+		        }
+		        else
+		        {
+		            result = divideHelper(dividend, divisor);                             //ERROR<-------------------------------------
+		            if ((!this.isPositive && B2.isPositive) ||
+		                    (this.isPositive && !B2.isPositive))
+		            {
+		                //if not 0, assign negative when -a * b or a * -b
+		                result.isPositive = false;
+		            }
+		        }
+		         
+		         
+		        return result;
+		     
+		    }
+		     
+		    public BigInt divideHelper(BigInt dividend, BigInt divisor)
+		    {
+		         
+		      
+		        int size1 = dividend.num.size();//
+		        int size2 = divisor.num.size();
+		         
+		             
+		        BigInt result = new BigInt();
+		         
+		         
+		         
+		         
+		        for (int i = 0; i < size1-1; i++) {
+		            //if (divisor.num.get(0) >= dividend.num.get(i)) {
+		                int n = dividend.num.get(i) / divisor.num.get(0);
+		        result.num.add(i,n);
+		         
+		        }
+		         
+		        String s = result.toString();
+		        String j = divisor.toString();
+		        int k = Integer.parseInt(s);
+		        int po = Integer.parseInt(j);
+		        int pop = k * po;
+		         
+		        BigInt poppop = new BigInt();
+		        poppop = result.multiply(divisor);                                //ERROR<-------------------------------------
+		        BigInt poopy = new BigInt();
+		        poopy =  result.subtract(poppop);
+		         
+		        return result;
+		     
+		}
+		    public String toString() {
+		 
+		        String string = "";
+		        if (isPositive == false)
+		            string = string + "-";
+		 
+		        for (int j = 0; j < num.size(); j++)
+		            string = string + num.get(j);
+		 
+		        return string;
+		    }
+		 
+		    // str.length() >= 1
+		    public boolean isLegal(String str) {
+		        boolean ok = true;
+		        int length = str.length();
+		        for (int i = 0; i < length; i++) {
+		            if (i == 0) {
+		                // The first character of str should be one of (1) "+",
+		                // (2) "-", or (3) "0" - "9"
+		                if (!(str.charAt(i) == '+' || str.charAt(i) == '-'
+		                    || (str.charAt(i) >= '0' && str.charAt(i) <= '9')))
+		                {
+		                    ok = false;
+		                }
+		            }
+		            else if (ok)
+		            {   // index > 1.
+		                // Now check index 1 to length - 1
+		                // Once the index 0 is all checked up, we just have to see
+		                // numbers and nothing else.
+		                if (!(str.charAt(i) >= '0' && str.charAt(i) <= '9'))
+		                {
+		                    ok = false;
+		                }
+		            }
+		        }
+		        return ok;
+		    }
+		 
+		    public void readBigInt(String str) {
+		 
+		        int size; // length of the str
+		        size = str.length();
+		 
+		        // case I: string of length 1 ("+", "-", "single number", or
+		        // illegal symbol string.
+		        if (size == 1) {
+		            if (str.charAt(0) == '+') {
+		                num.add(0);
+		            } // For "+" as input, add 0 at index 0
+		            else if (str.charAt(0) == '-') {
+		                num.add(0);
+		            } // "-" as input, do the same.
+		            else {
+		                num.add(str.charAt(0) - '0');
+		            }
+		        } else {
+		            // case II: string of length > 1.
+		            if (str.charAt(0) == '+') { // "+123"
+		                for (int i = 1; i < size; i++) {
+		                    num.add(str.charAt(i) - '0');
+		                }
+		            } else if (str.charAt(0) == '-') { // "-123"
+		                for (int i = 1; i < size; i++) {
+		                    num.add(str.charAt(i) - '0');
+		                }
+		                isPositive = false;
+		            } else { // "1234"
+		                for (int i = 0; i < size; i++) {
+		                    num.add(str.charAt(i) - '0');
+		                }
+		            }
+		        }
+		 
+		    }
+		 
+		}

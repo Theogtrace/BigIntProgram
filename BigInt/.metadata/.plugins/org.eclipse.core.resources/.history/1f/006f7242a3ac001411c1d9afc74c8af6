@@ -1,0 +1,470 @@
+
+public class BigInt {
+	 private boolean neg; // negative
+
+	 private int[] digit;//array of digits
+	 
+//	   constructor default
+	   public BigInt(){
+		   neg=true;
+		   digit= new int[0];
+	   }
+//	   BigInt String
+	   public BigInt(String b1) {
+
+	   String value = b1;
+
+	   neg = false;
+
+	   if (b1.charAt(0) == '+' || b1.charAt(0) == '-') {
+
+	   if (b1.length() > 1) {
+ 
+	   value = b1.substring(1);
+
+	   } else {
+
+	   System.out.println("this contains only sign: " + b1);
+
+	   return;
+
+	   }
+
+	   if (b1.charAt(0) == '-') //if is negative
+
+	   neg = true;
+
+	   }
+
+	   digit = new int[value.length()];
+
+	   for (int i = 0; i < value.length(); i++) {
+
+	   if (Character.isDigit(value.charAt(i))) {
+
+	   digit[digit.length - 1 - i] = Character.digit(value.charAt(i), 10);
+
+	   } else {
+       try {
+		throw new RuntimeException();
+	} catch (RuntimeException e) {
+		// TODO Auto-generated catch block
+		System.out.println("this contains non numeric values: " + b1);
+	}
+//	   System.out.println("this contains non numeric values: " + b1);
+
+	   return;
+
+	   }
+
+	   }
+
+	   }
+
+	  
+
+	   public String toString()
+
+	   {
+
+	   StringBuilder st = new StringBuilder();
+
+	   if (neg)
+
+	   st.append('-');
+
+	   else
+
+	   st.append('+');
+
+	   for(int i=0; i<digit.length; i++)
+
+	   {
+
+	   st.append(digit[digit.length - 1 - i]);
+
+	   }
+
+	   return st.toString();
+
+	   }
+
+	   private int[] removeLeadingZero(int[] a)
+
+	   {
+
+	   int i = a.length - 1;
+
+	   while (i > 0 && a[i] == 0)
+
+	   i--;
+
+	   int[] c = new int[i+1];
+
+	   for (int j = 0; j < c.length; j++)
+
+	   c[j] = a[j];
+
+	   return c;
+
+	   }
+
+	   // return 0 if same, <0 if a<b, > 0 if a > b
+
+	   private int compare(int[] a, int[] b)
+
+	   {
+
+	   if (a.length != b.length)
+
+	   return a.length - b.length;
+
+	   for (int i = a.length - 1; i >= 0; i--)
+
+	   {
+
+	   if (a[i] != b[i])
+
+	   return a[i] - b[i];
+
+	   }
+
+	   return 0;
+
+	   }
+
+	   private int[] addArr(int[] a, int[] b)
+
+	   {
+
+	   int size = Math.max(a.length, b.length) + 1;
+
+	   int[] c = new int[size];
+
+	   int carry = 0;
+
+	   for (int i = 0; i < a.length || i < b.length || carry > 0; i++)
+
+	   {
+
+	   int sum = carry;
+
+	   if (i < a.length)
+
+	   sum += a[i];
+
+	   if (i < b.length)
+
+	   sum += b[i];
+
+	   carry = sum / 10;
+
+	   sum = sum % 10;
+
+	   c[i] = sum;
+
+	   }
+
+	   return removeLeadingZero(c);
+
+	   }
+
+	   // assume a >= b
+
+	   private int[] subArr(int[] a, int[] b)
+
+	   {
+
+	   int[] c = new int[a.length];
+
+	   int carry = 0;
+
+	   for (int i = 0; i < a.length || i < b.length || carry != 0; i++)
+
+	   {
+
+	   int r = carry;
+
+	   if (i < a.length)
+
+	   r += a[i];
+
+	   if (i < b.length)
+
+	   r -= b[i];
+
+	   carry = (r < 0 ? -1 : 0);
+
+	   if (r < 0)
+
+	   r += 10;
+
+	   c[i] = r;
+
+	   }
+
+	   return removeLeadingZero(c);
+
+	   }
+//	   adding two ints 
+
+	   public BigInt add(BigInt other)
+
+	   {
+
+	   BigInt answer = new BigInt("0");
+
+	   if (this.neg && other.neg)
+
+	   {
+	
+	   answer.neg = true;
+
+	   answer.digit = addArr(this.digit, other.digit);// is going to go to this add Array
+
+	   }
+
+	   else if (!this.neg && !other.neg)// if they both are positive
+
+	   {
+
+	   answer.neg = false;
+
+	   answer.digit = addArr(digit, other.digit);// is going to the add array method
+
+	   }
+//Here is where it adds a positive number and a negative number
+	   else if (!neg) // positive + negative
+
+	   {
+
+	   if (compare(digit, other.digit) >= 0)
+
+	   {
+
+	   answer.neg = false;
+
+	   answer.digit = subArr(digit, other.digit);
+
+	   }
+
+	   else
+
+	   {
+
+	  answer.neg = true;
+
+	   answer.digit = subArr(other.digit, digit);
+
+	   }
+
+	   }
+
+	   else // negative + positive
+
+	   {
+
+	   if (compare(digit, other.digit) <= 0)
+
+	   {
+
+	   answer.neg = false;
+
+	   answer.digit = subArr(other.digit, digit);
+
+	   }
+
+	   else
+
+	   {
+
+	   answer.neg = true;
+
+	   answer.digit = subArr(digit, other.digit);
+
+	   }
+
+	   }
+
+	   return answer;
+
+	   }
+
+	   public BigInt sub(BigInt b)
+
+	   {
+
+	   BigInt answer = new BigInt("0");
+
+	   if (!neg && b.neg) // positive - negative
+
+	   {
+
+	   answer.neg = false;
+
+	   answer.digit = addArr(digit, b.digit);
+
+	   }
+
+	   else if (neg && !b.neg) // negative - positive
+
+	   {
+
+	   answer.neg = true;
+
+	   answer.digit = addArr(digit, b.digit);
+
+	   }
+
+	   else if (!neg && !b.neg) // positive - positive
+
+	   {
+
+	   if (compare(digit, b.digit) >= 0)
+
+	   {
+
+	   answer.neg = false;
+
+	   answer.digit = subArr(digit, b.digit);
+
+	   }
+
+	   else
+
+	   {
+
+	   answer.neg = true;
+
+	   answer.digit = subArr(b.digit, digit);
+
+	   }
+
+	   }
+
+	   else // negative - negative
+
+	   {
+
+	   if (compare(digit, b.digit) <= 0)
+
+	   {
+
+	   answer.neg = false;
+
+	   answer.digit = subArr(b.digit, digit);
+
+	   }
+
+	   else
+
+	   {
+
+	   answer.neg = true;
+
+	   answer.digit = subArr(digit, b.digit);
+
+	   }
+
+	   }
+
+	   return answer;
+
+	   }
+}
+//	   public BigInt mul(BigInt b)
+//
+//	   {
+//
+//	   BigInt r = new BigInt("+0");
+//
+//	   int p = 1;
+//
+//	   for (int i = 0; i < digit.length; i++)
+//
+//	   {
+//
+//	   int times = digit[i] * p;
+//
+//	   for (int j = 0; j < times; j++)
+//
+//	   r = r.add(b);
+//
+//	   p *= 10;
+//
+//	   }
+//
+//	   if (neg)
+//
+//	   r.neg = !r.neg;
+//
+//	   return r;
+//
+//	   }
+//
+//	   public BigInt div(BigInt b)
+//
+//	   {
+//
+//	   BigInt r = new BigInt("+0");
+//
+//	   int p = 1;
+//
+//	   for (int i = 1; i < digit.length; i++)
+//
+//	   {
+//
+//	   int times = digit[i] / p;
+//
+//	   for (int j = 1; j < times; j++)
+//
+//	   r = r.add(b);
+//
+//	   p /= 10;
+//
+//	   }
+//
+//	   if (neg)
+//
+//	   r.neg = !r.neg;
+//
+//	  
+//
+//	   return r;
+//
+//	}
+//
+//	   public BigInt modulus(BigInt b)
+//
+//	   {
+//
+//	   BigInt r = new BigInt("0");
+//
+//	   int p = 1;
+//
+//	   for (int i = 1; i < digit.length; i++)
+//
+//	   {
+//
+//	   int times = digit[i] % p;
+//
+//	   for (int j = 1; j < times; j++)
+//
+//	   r = r.add(b);
+//
+//	   p %= 10;
+//
+//	   }
+//
+//	   if (neg)
+//
+//	   r.neg = !r.neg;
+//
+//	  
+//
+//	   return r;
+//
+//	   }
+//
+//	  
+//}

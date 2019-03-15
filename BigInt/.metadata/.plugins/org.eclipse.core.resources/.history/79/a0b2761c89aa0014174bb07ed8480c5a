@@ -1,0 +1,11 @@
+
+public class RuntimeException extends Exception {
+	//If there is no number it will show this exception.
+		public RuntimeException() {
+			// TODO Auto-generated constructor stub
+			super("Not a number  Exception : Input is not a number");
+		}
+		public RuntimeException(String message) {
+			super("Not a number Exception:"+message);
+		}
+}

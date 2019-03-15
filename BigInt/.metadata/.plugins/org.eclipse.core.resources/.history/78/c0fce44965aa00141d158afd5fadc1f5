@@ -1,0 +1,130 @@
+
+public class BigInt {
+	   private int digit[];         // represent the integer as an array of digits
+	   private int size;            // number of digits in the integer
+	   private final int max = 50;  // maximum number of digits in the integer
+	public BigInt()
+	{     // default constructor
+	    size = 50;
+	    digit = new int[max];
+	    digit[0] = 0;
+	}
+	// constructor with initial String value
+	public BigInt(String num)
+	{  
+	  size = num.length();
+	  digit = new int[max];
+	  for (int ct = size - 1; ct >= 0; ct --)
+	  {
+//	    digit[ct] = Integer.parseInt(num.substring(size - ct - 1, size - ct));
+	  }
+	}
+
+	
+	// constructor with initial integer value
+    // constructor with initial integer value  
+   public BigInt(int num)
+    {  
+        size = max;
+        digit = new int[max];
+        int rem = num;
+        for ( int ct = max - 1; ct >= 0; ct--)
+        {
+            digit[ct] = rem % 10;
+            rem = rem / 10;
+        }
+   }
+
+
+
+
+	// override Object’s version
+	public String toString()
+	{
+	  String intString = "";
+	  for (int ct = size - 1; ct >= 0; ct --)
+	  {
+	    intString = intString + String.valueOf(digit[ct]);
+	  }
+	  return intString;
+	}
+
+	public int compareTo(BigInt other)
+	{
+	  int compare = 0;
+	  int stop = 0;
+	  if(this.size > other.size)
+	  {
+	    stop = this.size;
+	  }
+	  else
+	  {
+	  stop = other.size;
+	  }
+	 
+	  if(this.size > other.size)
+	  {
+	    compare = 1;// return  1 if this greater than other
+	  }
+	  else if(this.size < other.size)
+	  {
+	    compare = -1;// return -1 if this less than other
+	  }
+	  else if(this.size == other.size)
+	  { // return  0 if both equal
+	    for(int i = 0; i <= stop;i++)
+	    {
+	      if(this.digit[i] > other.digit[i])
+	      {
+	        compare = 1;
+	      }
+	      else if (this.digit[i] < other.digit[i])
+	      {
+	        compare = -1;
+	      }
+	      else  
+	       continue;
+	    }
+	  }
+	  else
+	  {
+	    compare = 0;
+	  }
+	 
+	  return compare;                                                                  
+	}
+
+
+
+    // add two BigInts
+    public BigInt add(BigInt arg)
+    {  
+        BigInt sum = new BigInt();//Create sum object
+        //declare and intialize carry
+        int carry = 0; 
+        int i, temp;
+       
+   
+
+        //add two BigInts
+        for(i = max - 1; i >= 0; i--)
+        {  
+        temp = this.digit[i] + arg.digit[i] + carry;   
+        sum.digit[i] = temp % 10;
+        carry = temp / 10;     
+        }
+       
+    return sum;
+       
+    }
+
+Read more: http://www.physicsforums.com
+ }
+	            
+	            
+	 
+
+
+
+
+	

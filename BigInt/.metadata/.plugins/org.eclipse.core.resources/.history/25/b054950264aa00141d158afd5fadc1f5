@@ -1,0 +1,204 @@
+
+public class BigInt {
+	   private int digit[];         // represent the integer as an array of digits
+	   private int size;            // number of digits in the integer
+	   private final int max = 50;  // maximum number of digits in the integer
+	public BigInt()
+	{     // default constructor
+	    size = 50;
+	    digit = new int[max];
+	    digit[0] = 0;
+	}
+	// constructor with initial String value
+	public BigInt(String num)
+	{  
+	  size = num.length();
+	  digit = new int[max];
+	  for (int ct = size - 1; ct >= 0; ct --)
+	  {
+//	    digit[ct] = Integer.parseInt(num.substring(size - ct - 1, size - ct));
+	  }
+	}
+	// constructor with initial integer value  
+	public BigInt(int num)
+	{  
+	  size = Integer.toString(num).length();
+	  digit = new int[max];
+	  int rem = num;
+	  for ( int ct = 0; ct <= size - 1; ct++)
+	  {
+	  digit[ct] = rem % 10;
+	  rem = rem / 10;
+	  }
+	}
+	
+	// Copy constructor
+	public BigInt(BigInt num)
+	{  
+	   // Copy member variables from num.
+	   size = num.size;
+	   // Copy the digits in each index.
+	   for(int i = 0; i < this.size; i++)
+	   {
+	      digit[i] = num.digit[i];
+	   }
+	}
+
+	// override Object’s version
+	public String toString()
+	{
+	  String intString = "";
+	  for (int ct = size - 1; ct >= 0; ct --)
+	  {
+	    intString = intString + String.valueOf(digit[ct]);
+	  }
+	  return intString;
+	}
+
+	public int compareTo(BigInt other)
+	{
+	  int compare = 0;
+	  int stop = 0;
+	  if(this.size > other.size)
+	  {
+	    stop = this.size;
+	  }
+	  else
+	  {
+	  stop = other.size;
+	  }
+	 
+	  if(this.size > other.size)
+	  {
+	    compare = 1;// return  1 if this greater than other
+	  }
+	  else if(this.size < other.size)
+	  {
+	    compare = -1;// return -1 if this less than other
+	  }
+	  else if(this.size == other.size)
+	  { // return  0 if both equal
+	    for(int i = 0; i <= stop;i++)
+	    {
+	      if(this.digit[i] > other.digit[i])
+	      {
+	        compare = 1;
+	      }
+	      else if (this.digit[i] < other.digit[i])
+	      {
+	        compare = -1;
+	      }
+	      else  
+	       continue;
+	    }
+	  }
+	  else
+	  {
+	    compare = 0;
+	  }
+	 
+	  return compare;                                                                  
+	}
+	 
+	// add two BigInt’s
+	public BigInt add(BigInt other)
+	{
+		// add two BigIntís
+		       
+	        BigInt sum = new BigInt();//Create sum object
+	         //declare and intialize carry
+	        int carry = 0; 
+	        int carry = 0; 
+            int i, temp;
+            //change size of sum
+            if(this.size > arg.size)
+                sum.size = this.size;
+            else
+                sum.size = arg.size;
+           
+            //add two BigInts
+           
+            for(i = 0; i <= sum.size-1; i++){
+               
+                temp = this.digit[i] + arg.digit[i];
+                temp = temp + carry;
+                System.out.println(i + " Temp is " + temp);
+               
+                    sum.digit[i] = temp % 10;
+                    carry = temp / 10;
+                    System.out.println(i + "Carry is " + carry);
+            System.out.println("sum.digit[" + i +"] is " + sum.digit[i]);
+                if(temp > 9){
+                   
+                    if(sum.digit[i] == sum.digit[sum.size-1]){
+                        sum.size = sum.size + 1;
+                        System.out.println("The while loop works when i is " + i);
+                    }
+                }
+                   
+            }//closes for
+           
+            return sum;
+           
+        }//closes plus
+     
+
+
+    // add two BigInts
+    public BigInt plus(BigInt arg)
+    {  
+       // Create sum object    
+       BigInt sum = new BigInt();
+
+       // declare and intialize carry
+       int carry = 0;  
+       int i, temp;
+
+       // change size of sum
+       if(this.size > arg.size)
+       {
+          sum.size = this.size;
+       }
+       else
+       {
+          sum.size = arg.size;
+       }
+
+       // add two BigInts
+       for(i = 0; i <= sum.size-1; i++)
+       {
+          temp = this.digit[i] + arg.digit[i];
+          temp = temp + carry;
+          System.out.println(i + " Temp is " + temp);
+               
+          sum.digit[i] = temp % 10;
+          carry = temp / 10;
+               
+          if(temp > 9)
+          {
+             while(sum.digit[i] == sum.digit[sum.size-1])
+             {
+                sum.size++;
+                System.out.println("The while loop works when i is " + i);
+             }
+          }
+          System.out.println(i + "Carry is " + carry);
+          System.out.println("sum.digit[" + i +"] is " + sum.digit[i]);    
+       }//closes for
+           
+       return sum;
+
+
+
+
+
+	   
+	}  }
+	            
+	            
+	 
+
+
+
+
+	

@@ -1,0 +1,570 @@
+
+	public class BigInt{
+
+		private int[] digit; // digits of number, i.e. 173 is {1,7,3}
+
+//		default constructor
+		  public BigInt() {
+		    digit = new int[]{-1};
+		  }
+
+//		   input string to initialize this BigInt with
+		  
+		  public BigInt(String s) {
+			  digit = new int[s.length()];
+		    for(int i = 0; i < s.length(); i++)
+		      digit[i] = toInt(s.charAt(i));
+		  }
+
+//		   Takes a char that should be an int, and converts to int
+		
+		  private static int toInt(char c) {
+		    return c-'0';
+		  }
+
+//		  Takes an int and converts to a BigInt
+		
+		  public BigInt(int n)throws RuntimeException {
+		    int nCopy = n;
+		    int numDigits = 0;
+		    if(nCopy == 0)
+		
+		      numDigits = 1;
+		
+		    else
+		      while(nCopy > 0) {
+		        numDigits++;
+		        nCopy = nCopy / 10;
+		      }
+		    digit = new int[numDigits];
+		    for(int i = numDigits-1; i >= 0; i--) {
+		      digit[i] = n % 10;
+		      n = n / 10;
+		    }
+		  }
+
+//		   Takes a BigInt to initialize this BigInt with
+		
+		  public BigInt(BigInt a) {
+		    digit = new int[a.digit.length];
+		    for(int i = 0; i < digit.length; i++)
+		      digit[i] = a.digit[i];
+		  }
+
+ 
+		
+		  public int[] getNum() { 
+			  return digit; 
+			  }
+		  public void setNum(int[] n) { 
+			  digit = n;
+			  }
+
+		  /**
+		   * Returns a boolean value for whether this BigInt is the flag
+		   * of an error.  Print an error message.
+		   *
+		   * @return whether this BigInt is the flag indicating an error
+		   */
+//		  public boolean isError() {
+//		    if(digit.length == 1 && digit[0] == -1) {
+//		      //System.out.println("This BigInt is the error flag.");
+//			  return true;
+//		    }
+//			else return false;
+//		  }
+
+//		   Adds two BigInts. 
+		 
+		  public static BigInt add(BigInt a, BigInt b) {
+		    int len=(a.digit.length>b.digit.length) ? a.digit.length : b.digit.length;
+		    int[] revSum = new int[len + 1]; // reversed sum
+		    int[] revANum = reverseArray(a.digit); // a reversed
+		    int[] revBNum = reverseArray(b.digit); // b reversed
+		    int carry = 0; // carry digit
+
+		    for(int i = 0; i <= len; i++) {
+		      if(i < revANum.length) { // need to add digit from revANum
+		        if(i < revBNum.length) { // need to add digit from revBNum
+		          revSum[i] = (revANum[i] + revBNum[i] + carry) % 10;
+		          carry = (revANum[i] + revBNum[i] + carry) / 10;
+		        }
+		        else { // don't need to add digit from revBNum
+		          revSum[i] = (revANum[i] + carry) % 10;
+		          carry = (revANum[i] + carry) / 10;
+		        }
+		      }
+		      else { // don't need to add digit from revANum
+		        if(i < revBNum.length) { // need to add digit from revBNum
+		          revSum[i] = (revBNum[i] + carry) % 10;
+		          carry = (revBNum[i] + carry) / 10;
+		        }
+		        else { // don't need to add digit from revBNum
+		          revSum[i] = carry;
+		          carry = 0;
+		        }
+		      }
+		    }
+
+		    int[] sum = reverseArray(revSum), realSum; // sum, and real sum
+		    if(sum.length > 1 && sum[0] == 0) {  // real sum is with possible
+		      realSum = new int[sum.length - 1]; // extra leading zero removed
+		      for(int j = 0; j < realSum.length; j++)
+		        realSum[j] = sum[j+1];
+		    }
+		    else
+		      realSum = sum;
+
+		    BigInt retInt = new BigInt(); // BigInt to return
+		    retInt.setNum(realSum);
+		    if(retInt.digit.length < 1)
+		      retInt.digit = new int[]{0};
+		    return retInt;
+		  }
+
+//		   Adds an array of BigInts. Hint: See hint for add.
+		
+		  public static BigInt add(BigInt[] ints) {
+		    if(ints.length == 1)
+		      return new BigInt(ints[0]);
+
+		    BigInt sum = null;
+			try {
+				sum = new BigInt(0);
+			} catch (RuntimeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    for(int i = 0; i < ints.length; i++)
+		      sum = add(sum, ints[i]);
+		    return sum;
+		  }
+
+		 
+//		    Helper method for the arithmetic operators to reverse all the
+//		    elements in an int array.
+	
+		  private static int[] reverseArray(int[] a) {
+		    int[] ret = new int[a.length];
+		    for(int i = 0; i < a.length; i++)
+		      ret[i] = a[a.length-1-i];
+		    return ret;
+		  }
+
+//		  Subtracts one BigInt from another.
+		  public static BigInt sub(BigInt a, BigInt b) {
+		    if(a.isLessThan(b))
+		      return new BigInt();
+
+		    int[] revDiff = new int[a.digit.length]; // reversed difference
+		    int[] revANum = reverseArray(a.digit); // a reversed
+		    int[] revBNum = reverseArray(b.digit); // b reversed
+
+		    for(int i = 0; i < revDiff.length; i++) {
+		      if(i < revBNum.length) { // need to use digit from revBNum
+		        if(revANum[i] >= revBNum[i]) // just regular subtraction
+		          revDiff[i] = revANum[i] - revBNum[i];
+		        else { // need to borrow
+		          revDiff[i] = 10 + revANum[i] - revBNum[i];
+		          revANum[i+1] -= 1;
+		        }
+		      }
+		      else { // don't need to use digit from revBNum
+		        revDiff[i] = revANum[i];
+		      }
+		    }
+
+		    int[] diff = reverseArray(revDiff); // non-reversed difference
+		    int nz = 0; // holds location of first non-zero digit in number
+		    while(nz < diff.length && diff[nz] == 0)
+		      nz++;
+		    int[] realDiff = new int[diff.length-nz]; // num w/o leading 0's
+		    for(int j = 0; j < realDiff.length; j++)
+		      realDiff[j] = diff[j+nz];
+
+		    BigInt retInt = new BigInt(); // BigInt to return
+		    retInt.setNum(realDiff);
+		    if(retInt.digit.length < 1)
+		      retInt.digit = new int[]{0};
+		    return retInt;
+		  }
+
+//		 Multiplies two BigInts. Hint: See hint for add.
+	
+		  public static BigInt mult(BigInt a, BigInt b) {
+		    BigInt zero = null;
+			try {
+				zero = new BigInt(0);
+			} catch (RuntimeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    if(a.isEqualTo(zero) || b.isEqualTo(zero))
+		      return zero;
+
+		    /* An Example of Algorithm (921 * 54)
+		     * [1,2,9] <- a reversed
+		     * [4,5] <- b reversed
+		     * revProd = [0,0,0,0,0] <- initial revProd
+		     * summand = [1,2,9]*4 = [4,8,6,3], revProd = [4,8,6,3,0]
+		     * summand = (0)[1,2,9]*5 = (0)[5,0,6,4], revProd = [4,3,7,9,4]
+		     * product = [4,9,7,3,4]
+		     */
+
+		    int len = a.digit.length + b.digit.length;
+		    int[] revProd = new int[len]; // reversed product
+		    int[] revANum = reverseArray(a.digit); // a reversed
+		    int[] revBNum = reverseArray(b.digit); // b reversed
+		    int[] summand = new int[revANum.length + 1];
+		    int carry = 0; // carry digit
+		    for(int i = 0; i < revProd.length; i++) // unnecessary
+		      revProd[i] = 0;
+
+		    // step through the digits in the reversed b
+		    for(int i = 0; i < revBNum.length; i++) {
+		      carry = 0;
+		      // create a summand for each one of the digits in b
+		      for(int k = 0; k < summand.length-1; k++) {
+		        summand[k] = (revBNum[i] * revANum[k] + carry) % 10;
+		        carry = (revBNum[i] * revANum[k] + carry) / 10;
+		      }
+		      summand[summand.length-1] = carry;
+
+		      // add the summand to the current reversed product
+		      // note: need temp since updating the location in revProd
+		      carry = 0;
+		      for(int k = 0; k < summand.length; k++) {
+		        int temp = revProd[k+i] + summand[k] + carry;
+		        revProd[k+i] = temp % 10;
+		        carry = temp / 10;
+		      }
+		      // carrys may "cascade" to the most significant digits
+		      for(int k = summand.length+i; k < revProd.length; k++) {
+		        int temp = revProd[k] + carry;
+		        revProd[k] = temp % 10;
+		        carry = temp / 10;
+		      }
+		    }
+
+		    int[] prod = reverseArray(revProd), realProd; // the product
+		    if(prod.length > 1 && prod[0] == 0) {  // real product is with
+		      realProd = new int[prod.length - 1]; // extra leading zero removed
+		      for(int j = 0; j < realProd.length; j++)
+		      realProd[j] = prod[j+1];
+		    }
+		    else
+		      realProd = prod;
+
+		    BigInt retInt = new BigInt(); // BigInt to return
+		    retInt.setNum(realProd);
+		    return retInt;
+		  }
+
+//		 Multiplies an array of BigInts. Hint: See hint for add.
+	
+		  public static BigInt multiply(BigInt[] ints) throws RuntimeException {
+		    if(ints.length == 1)
+		      return new BigInt(ints[0]);
+
+		    BigInt product = new BigInt(1);
+		    for(int i = 0; i < ints.length; i++)
+		      product = mult(product, ints[i]);
+		    return product;
+		  }
+
+	
+//		    Divides two BigInts to get "a/b". This method should use integer
+//		    division (i.e. drop any remainder)
+		  public static BigInt div(BigInt a, BigInt b) throws RuntimeException {
+		    try {
+				if(b.isEqualTo(new BigInt(0)))
+				  return new BigInt();
+			} catch (RuntimeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} // error: cannot divide by zero
+		    if(a.isLessThan(b))
+		      return new BigInt(0); // integer division, and a/b < 1
+
+		    /* An Example of Algorithm 931 / 54 = 17
+		     * [9,3,1] / [5,4], quot = [0,0], dividend = [9,3,1]
+		     * quot = [1,0], subtract = [5,4], new dividend = [3,9,1]
+		     * quot = [1,7], subtract = [3,7,8], new dividend = [1,5]
+		     * Another Example 12345 / 98 = 125
+		     * [1,2,3,4,5] / [9,8], quot = [0,0,0,0]
+		     * quot = [1,0,0,0], subtract = [0,9,8], new dividend = [2,5,4,5]
+		     * quot = [1,2,0,0], subtract = [1,9,6], new dividend = [5,8,5]
+		     * quot = [1,2,5,0], subtract = [4,9,0], new dividend = [9,5]
+		     */
+
+			int q = 0; // current position in the quotient
+			int divLoc = b.digit.length-1; // position in tempDiv
+			int[] quot = new int[a.digit.length-b.digit.length+1]; // partial quotient
+			BigInt subNum = new BigInt(), // for subtraction
+		             temp = new BigInt(), // for swapping and comparisons
+		          tempDiv = new BigInt(); // dividend with leading zeros
+			int mult; // holds the current multiplier
+
+			// initialize dividend
+			BigInt dividend = new BigInt(); // dividend w/o leading zeros
+			int[] d = new int[a.digit.length]; // temporary copy of dividend
+			for(int i = 0; i < a.digit.length; i++)
+			  d[i] = a.digit[i];
+			dividend.digit = d;
+			d = new int[a.digit.length]; // temporary copy of dividend
+			for(int i = 0; i < a.digit.length; i++)
+			  d[i] = a.digit[i];
+			tempDiv.digit = d;
+
+			// use long division, and build quotient one location at a time
+			// b is the divisor
+			while(!dividend.isLessThan(b)) {
+		      // copy values from dividend ("bring down" step)
+			  int[] part = new int[divLoc+1];
+			  for(int i = 0; i <= divLoc; i++)
+				part[i] = tempDiv.digit[i];
+
+		      // trim leading zeros, place part subtracting from into temp
+			  int nz = 0; // holds location of first non-zero digit in number
+			  while(nz < part.length && part[nz] == 0)
+			    nz++;
+			  int[] nzPart = new int[part.length-nz]; // num w/o leading 0's
+			  for(int j = 0; j < nzPart.length; j++)
+			    nzPart[j] = part[j+nz];
+			  temp.setNum(nzPart);
+
+		      // enter a zero in the quotient
+			  if(temp.isLessThan(b)) {
+				  quot[q++] = 0;
+				  divLoc++;
+			  }
+			  else {
+				  // init stuff to determine multiplier
+				  mult = 1;
+				  subNum = new BigInt();
+				  subNum.digit = new int[b.digit.length];
+				  for(int i = 0; i < b.digit.length; i++)
+					  subNum.digit[i] = b.digit[i];
+				  BigInt increment = new BigInt();
+				  increment.digit = new int[b.digit.length];
+				  for(int i = 0; i < b.digit.length; i++)
+					  increment.digit[i] = b.digit[i];
+
+				  // actually find the multiplier, and the number to subtract
+				  BigInt tempSub = new BigInt(subNum);
+				  while(!tempSub.isGreaterThan(temp)) {
+				    tempSub = add(subNum, increment);
+					if(!tempSub.isGreaterThan(temp)) {
+					  subNum = tempSub;
+					  mult++;
+					}
+				  }
+
+				  // update 1) tempDiv, 2) dividend, 3) quot/q/divLoc
+				  // 1) update tempDiv
+				  temp = sub(temp, subNum); // do the subtraction
+				  int ctr = divLoc;
+				  for(int i = temp.digit.length-1; i >= 0; i--, ctr--)
+					tempDiv.digit[ctr] = temp.digit[i];
+				  for(int i = 0; i <= ctr; i++)
+				    tempDiv.digit[i] = 0;
+
+				  // 2) update dividend
+				  nz = 0; // location of first non-zero digit in tempDiv
+				  while(nz < tempDiv.digit.length && tempDiv.digit[nz] == 0)
+				    nz++;
+				  int[] nzDiv = new int[tempDiv.digit.length-nz];
+		                                // w/o leading 0's
+				  for(int j = 0; j < nzDiv.length; j++)
+				    nzDiv[j] = tempDiv.digit[j+nz];
+				  dividend.setNum(nzDiv);
+
+				  // 3) update quot/q/divLoc
+				  quot[q++] = mult;
+				  divLoc++;
+			  }
+			}
+
+			BigInt realQuot = new BigInt(); // quotient to return
+
+			// remove extra leading 0's, if any
+			int nz = 0; // holds location of first non-zero digit in number
+			while(nz < quot.length && quot[nz] == 0)
+			  nz++;
+			int[] newQuot = new int[quot.length-nz]; // num w/o leading 0's
+			for(int j = 0; j < newQuot.length; j++)
+			  newQuot[j] = quot[j+nz];
+			realQuot.digit = newQuot;
+
+			return realQuot;
+		  }
+
+		  /**
+		   * Finds the remainder when a is divided by b. Note: Return an error
+		   * if the user tries to divide by zero.
+		   *
+		   * @param a the input BigInt to divide to find remainder
+		   * @param b the input BigInt to divide by to find remainder
+		   * @return the BigInt where the remainder will be stored
+		 * @throws RuntimeException 
+		   */
+		  public static BigInt mod(BigInt a, BigInt b) throws RuntimeException {
+		    if(b.digit.length == 1 && b.digit[0] == 0)
+		      return new BigInt();
+		    else
+		      return sub(a, mult(div(a, b), b));
+		  }
+
+		  /**
+		   * Returns a random BigInt with the number of digits less than or
+		   * equal to size.
+		   *
+		   * @param size the max number of digits in the random BigInt
+		   * @return the random BigInt that was generated
+		   */
+		  public static BigInt random(int size) {
+		    int len = 1 + (int)Math.floor(Math.random() * size);
+		    int[] myNum = new int[len];
+
+		    if(len > 1) // first digit should be non-zero
+		      myNum[0] = (int)Math.floor(Math.random() * 9 + 1);
+		    else
+		      myNum[0] = (int)Math.floor(Math.random() * 10);
+
+		    // the rest of the digits
+		    if(len > 1)
+		      for(int i = 1; i < len; i++)
+		        myNum[i] = (int)Math.floor(Math.random() * 10);
+
+		    BigInt retInt = new BigInt(); // the BigInt to return
+		    retInt.setNum(myNum);
+		    return retInt;
+
+		    /* ALTERNATIVELY
+		    int len = 1 + (int)Math.floor(Math.random() * size);
+		    int[] myNum = new int[len];
+
+		    for(int i = 0; i < len; i++)
+		      myNum[i] = (int)Math.floor(Math.random() * 10);
+
+		    // trim leading zeros
+		    int nz = 0; // holds location of first non-zero digit in number
+		    while(nz < myNum.length && myNum[nz] == 0)
+		      nz++;
+		    int[] newNum = new int[myNum.length-nz]; // num w/o leading 0's
+		    for(int j = 0; j < newNum.length; j++)
+		      newNum[j] = myNum[j+nz];
+
+		    BigInt retInt = new BigInt(); // the BigInt to return
+		    retInt.setNum(newNum);
+		    return retInt;
+		    */
+		  }
+
+//		 Returns a boolean value for whether this BigInt is equal
+//		    to the BigInt named a.
+	
+		  public boolean isEqualTo(BigInt a) {
+		    if(digit.length != a.digit.length)
+		      return false;
+
+		    boolean same = true; // true while locations in this and a same
+		    for(int i = 0; i < digit.length && same; i++)
+		      if(digit[i] != a.digit[i])
+		        same = false;
+		    return same;
+		  }
+
+//		  Returns a boolean value for whether this BigInt is less than
+//		   the BigInt named a.
+		
+		  public boolean isLessThan(BigInt a) {
+		   if(digit.length < a.digit.length)
+		     return true;
+		   else if(digit.length > a.digit.length)
+		     return false;
+
+		   for(int i = 0; i < digit.length; i++) {
+		     if(digit[i] > a.digit[i])
+		       return false;
+		     else if(digit[i] < a.digit[i])
+		       return true;
+		   }
+
+		   // the numbers are equal
+		   return false;
+		  }
+
+		 
+//		    Returns a boolean value for whether this BigInt is greater than
+//		    the BigInt named a.
+	
+		  public boolean isGreaterThan(BigInt a) {
+		   if(digit.length > a.digit.length)
+		     return true;
+		   else if(digit.length < a.digit.length)
+		     return false;
+
+		   for(int i = 0; i < digit.length; i++) {
+		     if(digit[i] < a.digit[i])
+		       return false;
+		     else if(digit[i] > a.digit[i])
+		       return true;
+		   }
+
+		   // the numbers are equal
+		   return false;
+		  }
+
+		  /**
+		   * Factors the current BigInt into prime factors and returns an
+		   * array that holds these factors. E.g., BigInt(12) should have
+		   * {BigInt(2), BigInt(2), BigInt(3)} intuitively.
+		   *
+		   * @return the array of BigInt factors
+		 * @throws RuntimeException 
+		   */
+		  public BigInt[] factor() throws RuntimeException {
+		    BigInt n = new BigInt(this); // the number to factor
+		    BigInt[] factors = new BigInt[0]; // stores factors of n
+		    BigInt ONE = new BigInt(1); // the number 1
+		    BigInt ZERO = new BigInt(0); // the number 0
+		    BigInt current = new BigInt(2); // current number to factor
+
+		    if(this.isEqualTo(ZERO))
+		      return new BigInt[]{ZERO};
+		    else if(this.isEqualTo(ONE))
+		      return new BigInt[]{ONE};
+
+		    while(!n.isEqualTo(ONE)) {
+		      BigInt rem = mod(n, current); // remainder
+		      if(rem.isEqualTo(ZERO)) { // n is divisible by current
+		        // add current to factors
+		        BigInt[] newFactors = new BigInt[factors.length+1];
+		        for(int i = 0; i < factors.length; i++)
+		          newFactors[i] = factors[i];
+		        newFactors[factors.length] = current;
+		        factors = newFactors;
+
+		        // update current (use copy constructor here), and n
+		        // this copy constructor isn't necessary... it just ensures
+		        // that all factors are stored in different memory locations
+		        current = new BigInt(current);
+		        n = div(n, current);
+		      }
+		      else // n is not divisible by current, so try next number
+		        current = add(current, ONE);
+		    }
+
+		    return factors;
+		  }
+
+//		   Returns the string representation of a BigInt. E.g., if num =
+		
+		  public String toString() {
+		    String s = "";
+		    for(int i = 0; i < digit.length; i++)
+		      s += digit[i];
+		    return s;
+		  }
+		}

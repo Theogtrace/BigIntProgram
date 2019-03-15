@@ -1,0 +1,46 @@
+public BigInt divideBy(BigInt other) 
+{
+BigInt temp = new BigInt();
+boolean found = false;
+int i =1;
+int start =0;
+if(this.toString().substring(i, i+1).equals("-"))
+{
+start =1;
+i=2;
+}
+BigInt middleman=new BigInt(this.toString().substring(start, i));
+while(found==false)
+{
+if(other.Larger(middleman))
+{
+BigInt temp2 = new BigInt(other.toString());
+int q =1;
+while(temp2.Larger(middleman)||temp2.toString().equals(middleman.toString()))
+{
+temp2=temp2.add(other);
+q+=1;
+}
+temp2=temp2.subtract(other);
+q-=1;
+temp.digitList.add(0,q);
+middleman = middleman.subtract(temp2);
+middleman = fixCarry(middleman);  //.removeRandomZero
+}
+else
+{
+temp.digitList.add(0,0);
+}
+if(temp.digitList.size()== this.digitList.size())
+{
+found=true;
+}
+else
+{
+i++;
+middleman.digitList.add(0,this.digitList.get(this.digitList.size()-1));
+}
+}
+return temp;
+ 
+}
